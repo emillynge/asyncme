@@ -73,18 +73,18 @@ setup(
         'cryptography',
         'jwcrypto',
     ],
-    extras_require={
-        'dns': [
-            'apache-libcloud',
-        ]
-    },
+    # extras_require={
+    #     'dns': [
+    #         'apache-libcloud',
+    #     ]
+    # },
     tests_require=[
         'pytest',
         'pytest-flake8'
     ],
     keywords=["acme", "let's encrypt", "ssl", "cert", "async", "asyncio"],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
