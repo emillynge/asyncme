@@ -69,13 +69,13 @@ setup(
     license='MIT',
     platforms=['any'],
     install_requires=[
-        'aiohttp',
-        'cryptography',
-        'jwcrypto',
+        'aiohttp>=0.21.6',
+        'cryptography>=1.4',
+        'jwcrypto>=0.2.1',
     ],
     extras_require={
         'contrib': [
-            'apache-libcloud',
+            'apache-libcloud>=0.20.1',
         ]
     },
     tests_require=[
