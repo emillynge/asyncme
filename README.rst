@@ -38,8 +38,6 @@ Asyncme is an AsyncIO library for interacting with the ACME (Automatic
 Certificate Management Environment) protocol, such as the services offered by
 Let's Encrypt.
 
-------------------
-
 Asyncme allows interaction with ACME servers using asynchronous http
 connections, useful for larger async applications that may need to requisition
 certificates automatically.
@@ -81,53 +79,53 @@ Examples
 
 1. Connect a client to an ACME endpoint
 
-    .. code:: python
+.. code:: python
 
-        from asyncme import AcmeClient, AsymmetricKey
-        import asyncio
+    from asyncme import AcmeClient, AsymmetricKey
+    import asyncio
 
-        loop = asyncio.get_event_loop()
+    loop = asyncio.get_event_loop()
 
-        # 1st - Load the ACME Account Key
-        account_key = AsymmetricKey.from_pem_file("my-acme-account.pem")
+    # 1st - Load the ACME Account Key
+    account_key = AsymmetricKey.from_pem_file("my-acme-account.pem")
 
-        # 2nd - Create a new ACME Client
-        client = AcmeClient(key, loop=loop)
+    # 2nd - Create a new ACME Client
+    client = AcmeClient(key, loop=loop)
 
-        # 3rd - Connect to an ACME Server via its Directory URL
-        # The Client will automatically be registered.
-        loop.run_until_complete(
-            client.connect(""https://acme-staging.api.letsencrypt.org/directory")
-        )
+    # 3rd - Connect to an ACME Server via its Directory URL
+    # The Client will automatically be registered.
+    loop.run_until_complete(
+        client.connect(""https://acme-staging.api.letsencrypt.org/directory")
+    )
 
 
 2. Request a Challenge for a Domain
 
-    .. code:: python
+.. code:: python
 
-        challenges = loop.run_until_complete(
-            client.get_challenges(domain="example.com")
-        )
+    challenges = loop.run_until_complete(
+        client.get_challenges(domain="example.com")
+    )
 
-        dns_challenge = challenges['dns-01']
+    dns_challenge = challenges['dns-01']
 
-        # Perform DNS Validation Manually
-        # (Automatic record provisioning will be made available in the future.)
-        auth_key = dns_challenge.key_authorization
+    # Perform DNS Validation Manually
+    # (Automatic record provisioning will be made available in the future.)
+    auth_key = dns_challenge.key_authorization
 
-        # Answer the Challenge
-        loop.run_until_complete(dns_challenge.answer())
+    # Answer the Challenge
+    loop.run_until_complete(dns_challenge.answer())
 
 
 3. Request a Certificate
 
-    .. code:: python
+.. code:: python
 
-        # Client expects raw CSR bytes in DER format (NOT PEM).
-        csr = <load csr>
+    # Client expects raw CSR bytes in DER format (NOT PEM).
+    csr = <load csr>
 
-        # Client returns new cert as raw DER bytes.
-        new_cert = loop.run_until_complete(client.get_cert(csr))
+    # Client returns new cert as raw DER bytes.
+    new_cert = loop.run_until_complete(client.get_cert(csr))
 
 
 Challenges
@@ -144,8 +142,6 @@ dns-01
 
 A contributed example Challenge Handler for satisfying 'dns-01' challenges
 is provided: ``asyncme.contrib.challenge_handlers.LibCloudDNSHandler``.
-
-------------------
 
 This handler provides support for the following DNS providers:
 
