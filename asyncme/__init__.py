@@ -1,5 +1,6 @@
 from . import acme
 from .acme.client import AcmeClient
+from .acme.challenges import register_challenge_handler
 
 from . import crypto
 from .crypto import AsymmetricKey

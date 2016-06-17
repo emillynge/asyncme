@@ -9,6 +9,7 @@ import aiohttp
 
 from asyncme import crypto, utils
 from asyncme.acme import messages
+from asyncme.acme.challenges import AcmeChallengeHandler, AcmeChallengeType
 
 # --------------------------------------------------------------------------- #
 
@@ -40,8 +41,8 @@ class AcmeClient:
             ))
         self.__priv_key = priv_key
 
-        self.__loop = loop or asyncio.get_event_loop()
-        self.__http_session = aiohttp.ClientSession(loop=self.__loop)
+        self._loop = loop or asyncio.get_event_loop()
+        self.__http_session = aiohttp.ClientSession(loop=self._loop)
 
         # ACME Server Attributes
         self.__connected = False
@@ -173,11 +174,13 @@ class AcmeClient:
         response = await self._post_msg(auth_msg, resp_codes=(201,))
         resp_body = await response.json()
 
+        authz_uri = response.headers.get("location")
+
         challenges = {}
         for challenge_body in resp_body['challenges']:
-            c = AcmeChallenge(self, challenge_body)
+            c = AcmeChallengeHandler(self, authz_uri, challenge_body)
             try:
-                challenges[AcmeChallengeType(c._challenge_msg['type'])] = c
+                challenges[AcmeChallengeType(challenge_body['type'])] = c
             # Unsupported challenge type.
             except ValueError:
                 pass
@@ -270,52 +273,3 @@ class AcmeClient:
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
         return resp
-
-
-class AcmeChallengeType(str, Enum):
-    DNS_01 = "dns-01",
-    HTTP_01 = "http-01",
-    TSL_SNI_01 = "tls-sni-01"
-
-
-class AcmeChallenge:
-
-    def __new__(cls, client, challenge_body):
-
-        if cls is AcmeChallenge:
-            if challenge_body['type'] == AcmeChallengeType.DNS_01:
-                return DNS01Challenge.__new__(DNS01Challenge, client, challenge_body)
-
-        return super().__new__(cls)
-
-    def __init__(self, client, challenge_body):
-
-        self._client = client                   # type: AcmeClient
-
-        # Assign URI -> URL
-        challenge_body['url'] = challenge_body['uri']
-        self._challenge_msg = messages.Challenge(**challenge_body)
-
-    @property
-    def key_authorization(self):
-        thumbprint = utils.jose_b64encode(self._client.priv_key.jwk_thumbprint)
-        return "{}.{}".format(self._challenge_msg['token'], thumbprint)
-
-    async def perform(self):
-        raise NotImplementedError("This type of challenge is not implemented, "
-                                  "you must perform the steps manually or "
-                                  "register an AcmeChallenge subclass.")
-
-    async def answer(self):
-        self._challenge_msg['keyAuthorization'] = self.key_authorization
-        await self._client._post_msg(self._challenge_msg)
-
-    async def get_status(self):
-        response = await self._client._get_msg(self._challenge_msg.url)
-        print("URL is: {}".format(self._challenge_msg.url))
-        resp_body = await response.json()
-        return resp_body['status']
-
-
-class DNS01Challenge(AcmeChallenge):
-    pass

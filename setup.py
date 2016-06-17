@@ -73,11 +73,11 @@ setup(
         'cryptography',
         'jwcrypto',
     ],
-    # extras_require={
-    #     'dns': [
-    #         'apache-libcloud',
-    #     ]
-    # },
+    extras_require={
+        'contrib': [
+            'apache-libcloud',
+        ]
+    },
     tests_require=[
         'pytest',
         'pytest-flake8'
