@@ -7,7 +7,7 @@ Asyncme
 :Author(s): Matthew Ellison (http://github.com/seglberg)
 :Maintainer(s): Matthew Ellison (http://github.com/seglberg)
 
-.. TRAVIS CI NYI .. image:: https://travis-ci.org/ArroyoNetworks/asyncme.svg?branch=master
+.. image:: https://travis-ci.org/ArroyoNetworks/asyncme.svg?branch=master
     :target: https://travis-ci.org/ArroyoNetworks/asyncme
 
 .. image:: https://img.shields.io/codecov/c/github/ArroyoNetworks/asyncme/master.svg?maxAge=2592000
