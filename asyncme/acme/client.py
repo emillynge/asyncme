@@ -11,6 +11,7 @@ from asyncme import crypto, utils
 from asyncme.acme import messages
 from asyncme.acme.challenges import AcmeChallengeHandler, AcmeChallengeType
 
+
 # --------------------------------------------------------------------------- #
 
 
@@ -28,23 +29,48 @@ class AcmeIdentifier(str, Enum):
 
 
 class AcmeClient:
+    """
+    A client used to interact with an ACME capable server.
+
+    To use the client, it must first be connected to a server via the
+    ``connect`` co-routine method.
+
+    :ivar _loop: The ``asyncio`` event loop instance used by the client.
+    """
+
+    # The following private instance variables are available, used for
+    # the client's internal implementation --
+
+    # __priv_key:       The user supplied private key.
+    # __http_session:   HTTP Session used for Async HTTP (via aiohttp).
+    # __connected:      Flag used to determine if connected to a server.
+    # __acme_url        URL of the ACME directory, as specified for connection.
+    # __directory       Contents of the ACME server's directory index.
+    # __reg_url         The URL of the Client's reg (registration) object.
+
+    # XXX:  To be honest, the internal implementation of the client using
+    # XXX:  the ACME messages (``asyncme.acme.messages``) is kind of dirty.
+    # XXX:  It could use a better implementation at some point.
 
     def __init__(self, priv_key, *, loop=None):
+        """
+        Creates a new client for asynchronously interacting with an ACME
+        server.
 
-        # Instance Attributes
+        :param priv_key: The private key used when interacting with the ACME
+         server. Must be an instance of ``asyncme.crypto.PrivateKey``.
+        :param loop: Set the asyncio loop used by the client. Defaults to
+         ``None`` which will use the default global loop.
+        """
 
-        # priv_key
-        #   Type Check
         if not isinstance(priv_key, crypto.PrivateKey):
             raise ValueError("'priv_key' must be an instance of {}".format(
                 crypto.PrivateKey
             ))
         self.__priv_key = priv_key
-
         self._loop = loop or asyncio.get_event_loop()
-        self.__http_session = aiohttp.ClientSession(loop=self._loop)
 
-        # ACME Server Attributes
+        self.__http_session = aiohttp.ClientSession(loop=self._loop)
         self.__connected = False
         self.__acme_url = None
         self.__directory = None
@@ -56,6 +82,11 @@ class AcmeClient:
 
     @property
     def priv_key(self):
+        """
+        Private key used by this client.
+
+        :return: An instance of ``asyncio.crypto.PrivateKey``.
+        """
         return self.__priv_key
 
     @priv_key.setter
@@ -65,22 +96,39 @@ class AcmeClient:
 
     @property
     def url(self):
+        """
+        URL of the ACME directory this client is connected to.
+
+        :return: ``str`` containing the URL this client is connected to, or
+         ``None`` if it not connected.
+        """
         return self.__acme_url
 
     @property
     def is_connected(self):
+        """
+        This client's connection status.
+
+        :return: ``True`` if the client has connected to an ACME server,
+         otherwise ``False``.
+        """
         return self.__connected
 
     async def connect(self, url):
         """
         Connect to an ACME server.
 
-        The client's key will automatically be registered with the remote
-        server.
+        The client will automatically be registered with the remote
+        server if it has not already been.
 
         :param url: The URL of the directory for the ACME server to connect to.
+
+        :returns: The client's registration information as a ``dict``.
+
         :raises ValueError: If the given URL is unavailable or is not a valid
          ACME directory.
+        :raises RuntimeError: If the client is already connected to a server,
+         even if the same URL value is given.
         """
 
         if self.is_connected:
@@ -117,6 +165,13 @@ class AcmeClient:
         return await self.get_reg()
 
     async def get_reg(self):
+        """
+        Fetches the client's registration information from the ACME server.
+
+        :return: The client's registration information as a ``dict``.
+
+        :raises RuntimeError: If the client is not connected to a server.
+        """
 
         if not self.is_connected:
             raise RuntimeError("Client must be connected first")
@@ -147,6 +202,16 @@ class AcmeClient:
         return tos.split(">")[0][1:]
 
     async def update_reg(self, *, contact=None, agreement=None):
+        """
+        Updates the client's registration information with the ACME server.
+
+        :param contact: The new contact information.
+        :param agreement: The new agreement contents.
+
+        :return: The updated client's registration information as a ``dict``.
+
+        :raises RuntimeError: If the client is not connected to a server.
+        """
 
         if not self.is_connected:
             raise RuntimeError("Client must be connected first")
@@ -163,6 +228,20 @@ class AcmeClient:
         return await response.json()
 
     async def get_challenges(self, domain):
+        """
+        Return a list of challenges for a given domain. By completing a
+        challenge, this client will be authorized to generate certificates
+        for the given domain.
+
+        :param domain: The domain to return challenges for.
+
+        :return: A ``dict`` containing instances of
+         ``asyncme.acme.challenges.AcmeChallengeHandler`` representing the
+         available challenges for the given domain. The keys of the returned
+         dictionary represent the challenge type, e.g. 'http-01'.
+
+        :raises RuntimeError: If the client is not connected to a server.
+        """
 
         if not self.is_connected:
             raise RuntimeError("Client must be connected first")
@@ -188,6 +267,21 @@ class AcmeClient:
         return challenges
 
     async def get_cert(self, csr, not_before=None, not_after=None):
+        """
+        Queries the ACME server for a certificate for the given CSR.
+
+        :param csr: Signing request for the desired certificate. Expected as
+         ``bytes`` in DER format.
+        :param not_before: Optional field for setting the notBefore field.
+         Defaults to ``None``.
+        :param not_after:  Optional field for setting the notAfter field.
+         Defaults to ``None``.
+
+        :return: ``bytes`` containing the new certificate, if the client is
+         authorized for the domain in the ``csr``.
+
+        :raises RuntimeError: If the client is not connected to a server.
+        """
 
         if not self.is_connected:
             raise RuntimeError("Client must be connected first")
