@@ -1,0 +1,21 @@
+language: python
+cache: pip
+python:
+  - "3.5"
+  - "3.5-dev"           # 3.5 development branch
+  - "nightly"           # currently 3.6-dev
+matrix:
+  fast_finish: true
+  allow_failures:
+    - python: "3.5-dev"
+    - python: "nightly"
+before_install:
+  - pip install codecov
+install:
+  - pip install -e .
+before_script:
+  - pip install pytest-runner
+script:
+  - python setup.py test --addopts "--cov asyncme --cov-report term-missing --flake8 asyncme tests/"
+after_success:
+  - codecov

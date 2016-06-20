@@ -80,7 +80,9 @@ setup(
     },
     tests_require=[
         'pytest',
-        'pytest-flake8'
+        'pytest-flake8',
+        'pytest-asyncio',
+        'pytest-cov'
     ],
     keywords=["acme", "let's encrypt", "ssl", "cert", "async", "asyncio"],
     classifiers=[
