@@ -5,6 +5,7 @@ from math import ceil
 from enum import Enum
 
 from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat import backends
 
 from asyncme import utils
@@ -63,6 +64,12 @@ class AsymmetricKey:
         else:
             raise ValueError("Key does not appear to be valid PEM format.")
 
+    def __new__(cls, *args, **kwargs):
+        if cls is AsymmetricKey:
+            raise RuntimeError("You must not instantiate AsymmetricKey "
+                               "directly")
+        return super().__new__(cls)
+
     def __init__(self, key, *, key_alg, key_type):
         self._key = key
         self._alg = key_alg
@@ -82,28 +89,79 @@ class AsymmetricKey:
 
     @property
     def thumbprint(self):
-        raise NotImplementedError("Must be implemented by subclass")
+        """
+        Returns the SHA256 thumbprint of the key pair.
+
+        :return: ``bytes`` containing the key pair thumbprint digest.
+        """
+        raise NotImplementedError("Must be implemented by subclass")            # pragma: nocover # noqa
 
     @property
     def fingerprint(self):
+        """
+        Synonym for ``AsymmetricKey.thumbprint``.
+        """
         return self.thumbprint
 
     @property
     def jwk_thumbprint(self):
-        raise NotImplementedError("Must be implemented by subclass")
+        """
+        Returns the SHA256 thumbprint of the key pair JWK.
+
+        .. note::
+
+            This is different than the standard thumbprint.
+            See RFC7638.
+
+        :return: ``bytes`` containing the JWK thumbprint digest.
+        """
+        raise NotImplementedError("Must be implemented by subclass")            # pragma: nocover # noqa
 
     def __len__(self):
         return self.size
 
     def to_jwk(self):
+        """
+        Convert this key to its JSON Web Key (JWK) format.
+
+        :return: A ``dict`` representing this key in JWK format.
+        """
         return {
             "kty": KeyAlgorithm(self.algorithm).upper()
         }
 
 
 class PublicKey(AsymmetricKey):
+    """
+    Represents an RSA Public Key.
+    """
 
     def __init__(self, key):
+        """
+        Creates a new PublicKey object from a
+        ``cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey``.
+
+        You should avoid instantiating this class directly unless you know
+        what you are doing. Use the loader methods on the ``AsymmetricKey``
+        parent class instead.
+
+        :param key: The underlying
+         ``cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey`` this
+         public key represents.
+
+        :raises ValueError: If the given key is not an instance of the expected
+         key type.
+        """
+
+        # If the given key is private, get it's corresponding public key.
+        if isinstance(key, rsa.RSAPrivateKey):
+            key = key.public_key()
+
+        if not isinstance(key, rsa.RSAPublicKey):
+            raise ValueError("Key must be an instance of {}".format(
+                rsa.RSAPublicKey
+            ))
+
         super().__init__(
             key=key,
             key_alg=KeyAlgorithm.RSA,
@@ -136,6 +194,7 @@ class PublicKey(AsymmetricKey):
 
     def to_jwk(self):
         jwk = super().to_jwk()
+
         jwk['n'] = _prepare_key_num(self._key.public_numbers().n)
         jwk['e'] = _prepare_key_num(self._key.public_numbers().e)
 
@@ -143,8 +202,32 @@ class PublicKey(AsymmetricKey):
 
 
 class PrivateKey(AsymmetricKey):
+    """
+    Represents an RSA Private Key.
+    """
 
     def __init__(self, key):
+        """
+        Creates a new PrivateKey object from a
+        ``cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey``.
+
+        You should avoid instantiating this class directly unless you know
+        what you are doing. Use the loader methods on the ``AsymmetricKey``
+        parent class instead.
+
+        :param key: The underlying
+         ``cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey`` this
+         private key represents.
+
+        :raises ValueError: If the given key is not an instance of the expected
+         key type.
+        """
+
+        if not isinstance(key, rsa.RSAPrivateKey):
+            raise ValueError("Key must be an instance of {}".format(
+                rsa.RSAPrivateKey
+            ))
+
         super().__init__(
             key=key,
             key_alg=KeyAlgorithm.RSA,
@@ -163,9 +246,16 @@ class PrivateKey(AsymmetricKey):
 
     @property
     def public_key(self):
+        """
+        Return the corresponding public key for this private key.
+
+        :return: A ``PublicKey`` object corresponding to the public key that
+         is derived for this ``PrivateKey``.
+        """
         return self._public_key
 
     def to_jwk(self):
+
         jwk = self.public_key.to_jwk()
         jwk['d'] = _prepare_key_num(self._key.private_numbers().d)
         jwk['p'] = _prepare_key_num(self._key.private_numbers().p)
