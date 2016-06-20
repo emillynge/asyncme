@@ -10,7 +10,7 @@ from . import utils                                                      # noqa
 
 # Please refrain from specifying a micro version if possible.
 # --------------------------------------------------------------------------- #
-VERSION = (0, 1, 'b2')
+VERSION = (0, 1, 'b3')
 # --------------------------------------------------------------------------- #
 
 
