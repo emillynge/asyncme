@@ -88,7 +88,9 @@ class AcmeChallengeHandler:
 
     @property
     def key_authorization(self):
-        thumbprint = utils.jose_b64encode(self.__client.priv_key.jwk_thumbprint)
+        thumbprint = utils.jose_b64encode(
+            self.__client.priv_key.jwk_thumbprint
+        )
         return "{}.{}".format(self.challenge_info['token'], thumbprint)
 
     @property
