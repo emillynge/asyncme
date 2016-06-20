@@ -320,28 +320,24 @@ class AcmeClient:
             url = self.__directory[msg.resource_type]
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-        LOG.debug("Sending\n{}\nto {}".format(
-            json.dumps(json.loads(jws), indent=4),
-            url
-        ))
+        LOG.info("Sending POST (JWS) to {}".format(url))
+        LOG.debug("JWS Contents: {}".format(jws))
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
+        json_types = ("application/json", "application/problem+json")
         async with self.__http_session.post(url, data=jws) as response:
             resp = response
             resp_code = response.status
             resp_headers = response.headers
-            if resp_headers.get("content-type") == "application/json":
+            if resp_headers.get("content-type") in json_types:
                 resp_body = await response.json()
             else:
                 resp_body = await response.text()
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-        LOG.debug("Response from {}:\nHEADERS {}\nSTATUS {}\n{}".format(
-            url,
-            resp_headers,
-            resp_code,
-            json.dumps(resp_body, indent=4)
-        ))
+        LOG.info("Response {} from {}".format(resp_code, url))
+        LOG.debug("Response Headers: {}".format(resp_headers))
+        LOG.debug("Response Body: {}".format(resp_body))
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
         assert resp_code in resp_codes, \
@@ -351,6 +347,11 @@ class AcmeClient:
         return resp
 
     async def _get_msg(self, url):
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+        LOG.info("Sending GET to {}".format(url))
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
         async with self.__http_session.get(url) as response:
             resp = response
             resp_code = response.status
@@ -358,12 +359,9 @@ class AcmeClient:
             resp_headers = response.headers
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-        LOG.debug("Response from {}:\nHEADERS {}\nSTATUS {}\n{}".format(
-            url,
-            resp_headers,
-            resp_code,
-            json.dumps(resp_body, indent=4)
-        ))
+        LOG.info("Response {} from {}".format(resp_code, url))
+        LOG.debug("Response Headers: {}".format(resp_headers))
+        LOG.debug("Response Body: {}".format(resp_body))
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
         return resp
