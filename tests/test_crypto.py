@@ -69,7 +69,7 @@ def rsa_public_key_PEM_file(request, rsa_public_key):
     # Encode public key as PEM
     pem = rsa_public_key.public_bytes(
         encoding=serialization.Encoding.PEM,
-        foramt=serialization.PublicFormat.SubjectPublicKeyInfo
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
     )
 
     # Write PEM key to a temporary file
