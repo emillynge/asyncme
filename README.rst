@@ -29,8 +29,7 @@ Introduction
 .. warning::
 
     This library is extremely new, use at your own risk. Expect large
-    changes and refactoring. In addition - there are currently no
-    test coverage.
+    changes and refactoring. Test coverage is actively being added.
 
 ------------------
 
