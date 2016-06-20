@@ -86,6 +86,12 @@ def rsa_public_key_PEM_file(request, rsa_public_key):
 
 
 @pytest.fixture
+def valid_private_key(rsa_private_key):
+    from asyncme.crypto import PrivateKey
+    return PrivateKey(rsa_private_key)
+
+
+@pytest.fixture
 def random_data_file(request):
 
     tmp = tempfile.NamedTemporaryFile(delete=False)

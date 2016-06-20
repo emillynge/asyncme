@@ -217,9 +217,9 @@ class AcmeClient:
 
         reg_msg = messages.Registration(url=self.__reg_url)
 
-        if contact:
+        if contact is not None:
             reg_msg['contact'] = contact
-        if agreement:
+        if agreement is not None:
             reg_msg['agreement'] = agreement
 
         response = await self._post_msg(reg_msg)

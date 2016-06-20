@@ -8,14 +8,8 @@ import pytest
 
 # --------------------------------------------------------------------------- #
 
-
-RSA_PUBLIC_JWK_KEYS = ['kty', 'e', 'n']
-RSA_PRIVATE_JWK_KEYS = RSA_PUBLIC_JWK_KEYS + ['p', 'qi', 'd', 'dp', 'q', 'dq']
-
-
-# --------------------------------------------------------------------------- #
-
 # Utils Tests
+
 
 def test_jose_encode_str():
     """Ensure that a `str` is encoded to base64 to JOSE specification"""
@@ -74,6 +68,7 @@ def test_custom_dumps():
 
     # `dumps` in utils is required to produce minified JSON
     assert json_str == '{"bytes":"bytes","int":1}'
+
 
 def test_custom_loads():
 
