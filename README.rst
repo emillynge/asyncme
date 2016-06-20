@@ -10,7 +10,7 @@ Asyncme
 .. image:: https://travis-ci.org/ArroyoNetworks/asyncme.svg?branch=master
     :target: https://travis-ci.org/ArroyoNetworks/asyncme
 
-.. image:: https://img.shields.io/codecov/c/github/ArroyoNetworks/asyncme/master.svg?maxAge=604800
+.. image:: https://img.shields.io/codecov/c/github/ArroyoNetworks/asyncme/master.svg?maxAge=600
     :target: https://codecov.io/github/ArroyoNetworks/asyncme?branch=master
 
 .. image:: https://img.shields.io/pypi/v/asyncme.svg
