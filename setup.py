@@ -72,12 +72,8 @@ setup(
         'aiohttp>=0.21.6',
         'cryptography>=1.4',
         'jwcrypto>=0.2.1',
+        'dnspython>=1.14.0'
     ],
-    extras_require={
-        'contrib': [
-            'apache-libcloud>=0.20.1',
-        ]
-    },
     tests_require=[
         'pytest',
         'pytest-flake8',

@@ -1,13 +1,15 @@
 from enum import Enum
 
+from asyncio import BaseEventLoop
+
 from asyncme import utils
 from asyncme.acme import messages
 
-
 # --------------------------------------------------------------------------- #
 
+# Type Hints
 
-_CHALLENGE_HANDLERS = {}
+import asyncme.acme.client
 
 
 # --------------------------------------------------------------------------- #
@@ -16,106 +18,105 @@ _CHALLENGE_HANDLERS = {}
 class AcmeChallengeType(str, Enum):
     DNS_01 = "dns-01",
     HTTP_01 = "http-01",
-    TSL_SNI_01 = "tls-sni-01"
+    TLS_SNI_01 = "tls-sni-01"
 
 
-def register_challenge_handler(handler_cls):
+class AcmeChallenge:
     """
-    Registers a new AcmeChallengeHandler for performing a challenge to
-    satisfy an ACME authorization request.
-
-    You can create your own handlers by subclassing `AcmeChallengeHandler`
-    and then registering it via this function.
-
-    :param handler_cls: The new handler to register.
-    :raises ValueError: If the given handler class is invalid.
+    The AcmeChallenge class represents the parameters of an ACME authorization
+    challenge, and contains all the information necessary for a handler
+    to complete and response to the challenge.
     """
-    if not issubclass(handler_cls, AcmeChallengeHandler):
-        raise ValueError("Given handler to register must be a subclass of "
-                         "{}".format(AcmeChallengeHandler))
 
-    if not handler_cls.type:
-        raise ValueError("Given handler to register must have a challenge "
-                         "type set on its `type` class attribute")
+    def __init__(self, client: 'asyncme.acme.client.AcmeClient', authz: dict,
+                 contents: dict):
+        """
+        Creates a new ACMEChallenge object/
 
-    try:
-        handler_type = AcmeChallengeType(handler_cls.type)
-    except ValueError:
-        raise ValueError("Given handler to register has an invalid handler "
-                         "type: {}".format(handler_cls.type))
-
-    _CHALLENGE_HANDLERS[handler_type] = handler_cls
-
-
-def get_challenge_handler(handler_type):
-
-    try:
-        handler_type = AcmeChallengeType(handler_type)
-    except ValueError:
-        raise ValueError("Invalid challenge handler type")
-
-    return _CHALLENGE_HANDLERS.get(handler_type)
-
-
-# --------------------------------------------------------------------------- #
-
-
-class AcmeChallengeHandler:
-
-    type = None
-
-    def __new__(cls, client, authz_uri, contents):
-
-        if cls is AcmeChallengeHandler:
-            try:
-                handler_type = AcmeChallengeType(contents['type'])
-                actual_cls = get_challenge_handler(handler_type)
-                if actual_cls:
-                    return actual_cls.__new__(actual_cls, client,
-                                              authz_uri, contents)
-            except (ValueError, KeyError):
-                pass
-
-        return super().__new__(cls)
-
-    def __init__(self, client, authz_uri, contents):
+        :param client: The client which created the challenge.
+        :param authz: The authz information containing the challenge.
+        :param contents: This challenge's contents.
+        """
 
         self.__client = client
-        self.__authz_uri = authz_uri
+        self.__loop = self.__client._loop
+        self.__authz = authz
 
         self.challenge_info = messages.Challenge(url=contents['uri'],
                                                  **contents)
 
     @property
-    def key_authorization(self):
+    def fqdn(self) -> str:
+        """
+        :return: The fully qualified name of the domain being authorized by
+         this challenge.
+        """
+        fqdn = self.__authz['identifier']['value']
+        if not fqdn.endswith("."):
+            fqdn += "."
+        return fqdn
+
+    @property
+    def key_authorization(self) -> str:
+        """
+        :return: The `keyAuthorization` of the challenge.
+        """
         thumbprint = utils.jose_b64encode(
             self.__client.priv_key.jwk_thumbprint
         )
         return "{}.{}".format(self.challenge_info['token'], thumbprint)
 
     @property
-    def loop(self):
-        return self.__client._loop
+    def type(self) -> AcmeChallengeType:
+        """
+        :return: This challenge's type.
+        """
+        return AcmeChallengeType(self.challenge_info['type'])
 
-    async def get_status(self):
+    @property
+    def url(self) -> str:
+        """
+        :return: The URL of this challenge on the ACME server.
+        """
+        return self.challenge_info.url
+
+    async def answer(self) -> None:
+        """
+        Answers this challenge, thereby allowing to remote ACME server to check
+        for the proper answer in an attempt to validate the authorization
+        request.
+        """
+        self.challenge_info['keyAuthorization'] = self.key_authorization
+        await self.__client._post_msg(self.challenge_info)
+
+    async def get_status(self) -> str:
+        """
+        Gets the current status of this ACME challenge (authorization status).
+
+        Authorization status may be:
+        - unknown
+        - pending
+        - processing
+        - valid
+        - invalid
+        - revoked
+
+        XXX: Might be worth making an Enum for these as well, since we will
+        XXX: want to eventually have more in-depth checking of authorization
+        XXX: statuses.
+
+        :return: The current status of this ACME challenge, according to the
+         remote server.
+        """
         response = await self.__client._get_msg(self.challenge_info.url)
         resp_body = await response.json()
         return resp_body['status']
 
-    async def get_authz(self):
+    def get_client_loop(self) -> BaseEventLoop:
         """
-        Returns the Authorization resource which corresponds to this challenge.
+        Get's the asynchronous loop instance used by the ``AcmeClient``
+        which created this challenge.
 
-        :return: A dictionary containing the Authorization resource contents.
+        :return: The asynchronous loop used by the client.
         """
-        response = await self.__client._get_msg(self.__authz_uri)
-        return await response.json()
-
-    async def perform(self, *args, **kwargs):
-        raise NotImplementedError("This type of challenge is not implemented, "
-                                  "you must perform the steps manually or "
-                                  "register an AcmeChallenge subclass.")
-
-    async def answer(self):
-        self.challenge_info['keyAuthorization'] = self.key_authorization
-        await self.__client._post_msg(self.challenge_info)
+        return self.__loop

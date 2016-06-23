@@ -1,6 +1,5 @@
 from . import acme                                                       # noqa
 from .acme.client import AcmeClient                                      # noqa
-from .acme.challenges import register_challenge_handler                  # noqa
 
 from . import crypto                                                     # noqa
 from .crypto import AsymmetricKey                                        # noqa
@@ -10,7 +9,7 @@ from . import utils                                                      # noqa
 
 # Please refrain from specifying a micro version if possible.
 # --------------------------------------------------------------------------- #
-VERSION = (0, 1, 'b3')
+VERSION = (0, 1, 'b4', 'dev0')
 # --------------------------------------------------------------------------- #
 
 

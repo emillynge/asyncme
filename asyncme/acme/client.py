@@ -8,7 +8,7 @@ import aiohttp
 
 from asyncme import crypto, utils
 from asyncme.acme import messages
-from asyncme.acme.challenges import AcmeChallengeHandler, AcmeChallengeType
+from asyncme.acme.challenges import AcmeChallenge, AcmeChallengeType
 
 
 # --------------------------------------------------------------------------- #
@@ -252,11 +252,9 @@ class AcmeClient:
         response = await self._post_msg(auth_msg, resp_codes=(201,))
         resp_body = await response.json()
 
-        authz_uri = response.headers.get("location")
-
         challenges = {}
         for challenge_body in resp_body['challenges']:
-            c = AcmeChallengeHandler(self, authz_uri, challenge_body)
+            c = AcmeChallenge(self, resp_body, challenge_body)
             try:
                 challenges[AcmeChallengeType(challenge_body['type'])] = c
             # Unsupported challenge type.
