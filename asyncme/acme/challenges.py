@@ -9,7 +9,7 @@ from asyncme.acme import messages
 
 # Type Hints
 
-import asyncme.acme.client
+import asyncme.acme.client                                               # noqa
 
 
 # --------------------------------------------------------------------------- #
