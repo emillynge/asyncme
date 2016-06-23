@@ -88,7 +88,7 @@ Examples
         # 3rd - Connect to an ACME Server via its Directory URL
         # The Client will automatically be registered.
         loop.run_until_complete(
-            client.connect(""https://acme-staging.api.letsencrypt.org/directory")
+            client.connect("https://acme-staging.api.letsencrypt.org/directory")
         )
 
 
