@@ -82,13 +82,13 @@ class AcmeChallengeHandler:
         return self.__loop
 
     async def _do_cleanup(self) -> None:
-        raise RuntimeError("Must be overridden by the handler subclass")        # pragma: nocover # noqa
+        pass                                                                    # pragma: nocover # noqa
 
     async def _do_perform(self) -> None:
-        raise RuntimeError("Must be overridden by the handler subclass")        # pragma: nocover # noqa
+        pass                                                                    # pragma: nocover # noqa
 
     async def _do_verify(self) -> None:
-        return                                                                  # pragma: nocover # noqa
+        pass                                                                    # pragma: nocover # noqa
 
     async def perform(self) -> None:
         """
