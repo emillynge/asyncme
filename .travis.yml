@@ -15,7 +15,8 @@ install:
   - pip install -e .
 before_script:
   - pip install pytest-runner
+  - pip install pytest-flake8
 script:
-  - python setup.py test --addopts "--cov asyncme --cov-report term-missing --flake8 asyncme tests/"
+  - python setup.py test
 after_success:
   - codecov
