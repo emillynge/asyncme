@@ -5,7 +5,7 @@ import logging
 from cryptography.hazmat import backends
 from cryptography.hazmat.primitives import hashes
 
-from dns.resolver import query, NoAnswer, NXDOMAIN
+from dns.resolver import get_default_resolver, NoAnswer, NXDOMAIN
 
 from asyncme import utils
 from asyncme.acme.challenges import AcmeChallengeType, AcmeChallenge
@@ -175,8 +175,13 @@ class DNS01ChallengeHandler(AcmeChallengeHandler):
             # (1) Query for the DNS Record (Answer)
             LOG.debug("{}: _do_verify querying for "
                       "{}".format(self, self.txt_record_name()))
+
+            resolver = get_default_resolver()
+            resolver.nameservers = ['8.8.8.8', '8.8.4.4']
+
             try:
-                answers = query(self.txt_record_name(), 'TXT').response.answer
+                query = resolver.query(self.txt_record_name(), 'TXT')
+                answers = query.response.answer
             except (NoAnswer, NXDOMAIN):
                 LOG.debug("{}: _do_verify no records found".format(self))
                 continue
