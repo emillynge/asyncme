@@ -69,8 +69,9 @@ setup(
     license='MIT',
     platforms=['any'],
     install_requires=[
+        'arroyo>=1.1',
+        'arroyo-crypto',
         'aiohttp>=0.21.6',
-        'cryptography>=1.4',
         'jwcrypto>=0.2.1',
         'dnspython>=1.14.0'
     ],

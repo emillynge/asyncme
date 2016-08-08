@@ -1,13 +1,12 @@
 
 import asyncio
+import hashlib
 import logging
-
-from cryptography.hazmat import backends
-from cryptography.hazmat.primitives import hashes
 
 from dns.resolver import get_default_resolver, NoAnswer, NXDOMAIN
 
-from asyncme import utils
+from arroyo import utils
+
 from asyncme.acme.challenges import AcmeChallengeType, AcmeChallenge
 
 
@@ -204,9 +203,9 @@ class DNS01ChallengeHandler(AcmeChallengeHandler):
         :return: Expected contents of the DNS TEXT record used to satisfy
          this DNS-01 challenge.
         """
-        digest = hashes.Hash(hashes.SHA256(), backends.default_backend())
-        digest.update(self.challenge.key_authorization.encode())
-        return utils.jose_b64encode(digest.finalize())
+        checksum = hashlib.sha256()
+        checksum.update(self.challenge.key_authorization.encode())
+        return utils.jose_b64encode(checksum.digest())
 
     def txt_record_name(self) -> str:
         """

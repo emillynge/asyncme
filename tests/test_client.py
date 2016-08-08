@@ -1,9 +1,13 @@
 
+import pytest
+
+
+# --------------------------------------------------------------------------- #
+
+# Asyncme Client Tests
+
 from asyncme.acme.challenges import AcmeChallengeType
 from asyncme.acme.client import AcmeClient
-
-import pytest
-from tests.fixtures import *
 
 
 # --------------------------------------------------------------------------- #
@@ -12,9 +16,12 @@ from tests.fixtures import *
 ACME_URL = "https://acme-staging.api.letsencrypt.org/directory"
 
 
+# --------------------------------------------------------------------------- #
+
+
 @pytest.fixture
-def acme_client(event_loop, valid_private_key):
-    return AcmeClient(valid_private_key, loop=event_loop)
+def acme_client(event_loop, private_key):
+    return AcmeClient(private_key, loop=event_loop)
 
 
 # --------------------------------------------------------------------------- #
@@ -38,10 +45,10 @@ def test_client_url_is_none_before_connect(acme_client):
 
 
 @pytest.mark.asyncio
-async def test_client_connect(event_loop, valid_private_key):
+async def test_client_connect(event_loop, private_key):
 
     # Test Connecting with Fresh Private Key
-    client = AcmeClient(valid_private_key, loop=event_loop)
+    client = AcmeClient(private_key, loop=event_loop)
     reg_info = await client.connect(ACME_URL)
 
     # Test that Connect Returns Registration Info
@@ -49,7 +56,7 @@ async def test_client_connect(event_loop, valid_private_key):
     assert len(reg_info) > 0
 
     # Test Connecting with a Previously Registered Key
-    client = AcmeClient(valid_private_key, loop=event_loop)
+    client = AcmeClient(private_key, loop=event_loop)
     await client.connect(ACME_URL)
 
 

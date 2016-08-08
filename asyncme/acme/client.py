@@ -6,7 +6,9 @@ from enum import Enum
 
 import aiohttp
 
-from asyncme import crypto, utils
+from arroyo import crypto
+
+from asyncme import utils
 from asyncme.acme import messages
 from asyncme.acme.challenges import AcmeChallenge, AcmeChallengeType
 
@@ -84,7 +86,7 @@ class AcmeClient:
         """
         Private key used by this client.
 
-        :return: An instance of ``asyncio.crypto.PrivateKey``.
+        :return: An instance of ``arroyo.crypto.asymmetric.PrivateKey``.
         """
         return self.__priv_key
 

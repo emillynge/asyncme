@@ -1,16 +1,17 @@
 
 import json
 
-from asyncme.crypto import PrivateKey
-from asyncme.acme import messages
-
 import pytest
-from tests.fixtures import rsa_private_key
 
 
 # --------------------------------------------------------------------------- #
 
 # ACME Messages - AcmeResource Base Class Tests
+
+from asyncme.acme import messages
+
+
+# --------------------------------------------------------------------------- #
 
 
 class MyResource(messages.AcmeResource):
@@ -43,12 +44,10 @@ def test_restricted_setitem_on_init():
         MyResource(no='no')
 
 
-def test_convert_to_jws(rsa_private_key):
-
-    key = PrivateKey(rsa_private_key)
+def test_convert_to_jws(private_key):
 
     my_resource = MyResource()
-    jws = my_resource.to_jws(key, 'my_random_nonce')
+    jws = my_resource.to_jws(private_key, 'my_random_nonce')
 
     # Non-compacted JWS is a valid JSONified object
     json.loads(jws)

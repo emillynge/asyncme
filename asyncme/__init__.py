@@ -1,9 +1,6 @@
 from . import acme                                                       # noqa
 from .acme.client import AcmeClient                                      # noqa
 
-from . import crypto                                                     # noqa
-from .crypto import AsymmetricKey                                        # noqa
-
 from . import utils                                                      # noqa
 
 
