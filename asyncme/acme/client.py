@@ -6,9 +6,8 @@ from enum import Enum
 
 import aiohttp
 
-from arroyo import crypto
+from arroyo import utils, crypto
 
-from asyncme import utils
 from asyncme.acme import messages
 from asyncme.acme.challenges import AcmeChallenge, AcmeChallengeType
 
@@ -280,14 +279,18 @@ class AcmeClient:
          authorized for the domain in the ``csr``.
 
         :raises RuntimeError: If the client is not connected to a server.
+        :raises TypeError: If the given CSR is not a
+         valid ``arroyo.crypto.x509.x509CertSignReq`` object.
         """
 
         if not self.is_connected:
             raise RuntimeError("Client must be connected first")
 
-        encoded_csr = utils.jose_b64encode(csr)
+        if not isinstance(csr, crypto.x509CertSignReq):
+            raise TypeError("The CSR must be an instance of x509CertSignReq")
 
-        cert_msg = messages.NewCertificate(csr=encoded_csr)
+        csr_bytes = csr.to_bytes(encoding=crypto.EncodingType.DER)
+        cert_msg = messages.NewCertificate(csr=utils.jose_b64encode(csr_bytes))
 
         if not_before:
             cert_msg['notBefore'] = not_before
@@ -295,7 +298,7 @@ class AcmeClient:
             cert_msg['notAfter'] = not_after
 
         response = await self._post_msg(cert_msg, resp_codes=(201,))
-        return await response.read()
+        return crypto.x509Cert(data=await response.read())
 
     # ----------------------------------------------------------------------- #
     #   HTTP Helpers

@@ -72,7 +72,7 @@ Examples
 
 1. Connect a client to an ACME endpoint:
 
-   .. code:: python
+   .. code-block:: python
     
         from asyncme import AcmeClient
         from arroyo.crypto import PrivateKey
@@ -95,7 +95,7 @@ Examples
 
 2. Request a Challenge for a Domain:
 
-   .. code:: python
+   .. code-block:: python
     
         from asyncme.plugins.challenge_handlers import DNS01ChallengeHandler
     
@@ -119,12 +119,14 @@ Examples
 3. Request a Certificate:
 
    .. code-block:: python
+
+        from arroyo.crypto import x509CertSignReq
+
+        csr = x509CertSignReq.from_file("my-pre-generated-request.csr")
     
-        # Client expects raw CSR bytes in DER format (NOT PEM).
-        csr = <Load CSR DER Bytes>
-    
-        # Client returns new cert as raw DER bytes.
+        # Client returns a new arroyo.crypto.x509.x509Cert Object
         new_cert = loop.run_until_complete(client.get_cert(csr))
+        new_cert.to_file("my-amce-signed-certificate.cert")
 
 
 Challenges
