@@ -79,11 +79,12 @@ setup(
         'pytest',
         'pytest-flake8',
         'pytest-asyncio',
-        'pytest-cov'
+        'pytest-cov',
+        'pytest-timeout'
     ],
     keywords=["acme", "let's encrypt", "ssl", "cert", "async", "asyncio"],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
