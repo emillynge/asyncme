@@ -32,14 +32,17 @@ except (FileNotFoundError, PermissionError):
     pass
 
 
-def _get_version(version_tuple):
-    end = version_tuple[-1]
-    if isinstance(end, str) and end.startswith(('a', 'b', 'rc')):
-        return '.'.join(map(str, version_tuple[:-1])) + version_tuple[-1]
-    return '.'.join(map(str, version_tuple))
+def _get_version(vt):                                                           # pragma: nocover # noqa
+    vt = tuple(map(str, vt))                                                    # pragma: nocover # noqa
+    m = map(lambda v: v.startswith(('a', 'b', 'rc')), vt)                       # pragma: nocover # noqa
+    try:                                                                        # pragma: nocover # noqa
+        i = next(i for i, v in enumerate(m) if v)                               # pragma: nocover # noqa
+    except StopIteration:                                                       # pragma: nocover # noqa
+        return '.'.join(vt)                                                     # pragma: nocover # noqa
+    return '.'.join(vt[:i]) + '.'.join(vt[i:])                                  # pragma: nocover # noqa
 
 # Read the Version from __init__.py Manually by Opening the File
-init = os.path.join(here, NAME, '__init__.py')
+init = os.path.join(here, NAME.replace("-", "_"), '__init__.py')
 version_line = list(filter(lambda l: l.startswith('VERSION'), open(init)))[0]
 
 VERSION = _get_version(eval(version_line.split('=')[-1]))
