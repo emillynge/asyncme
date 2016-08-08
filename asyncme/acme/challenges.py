@@ -1,9 +1,11 @@
-from enum import Enum
+# --------------------------------------------------------------------------- #
 
+
+from enum import Enum
 from asyncio import BaseEventLoop
 
-from asyncme import utils
 from asyncme.acme import messages
+
 
 # --------------------------------------------------------------------------- #
 
@@ -61,9 +63,7 @@ class AcmeChallenge:
         """
         :return: The `keyAuthorization` of the challenge.
         """
-        thumbprint = utils.jose_b64encode(
-            self.__client.priv_key.jwk_thumbprint
-        )
+        thumbprint = self.__client.priv_key.public_key.jwk_thumbprint
         return "{}.{}".format(self.challenge_info['token'], thumbprint)
 
     @property
