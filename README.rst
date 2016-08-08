@@ -74,16 +74,17 @@ Examples
 
    .. code:: python
     
-        from asyncme import AcmeClient, AsymmetricKey
+        from asyncme import AcmeClient
+        from arroyo.crypto import PrivateKey
         import asyncio
     
         loop = asyncio.get_event_loop()
         
         # 1st - Load the ACME Account Key
-        account_key = AsymmetricKey.from_pem_file("my-acme-account.pem")
+        account_key = PrivateKey.from_file("my-acme-account.pem")
         
         # 2nd - Create a new ACME Client
-        client = AcmeClient(key, loop=loop)
+        client = AcmeClient(account_key, loop=loop)
         
         # 3rd - Connect to an ACME Server via its Directory URL
         # The Client will automatically be registered.
