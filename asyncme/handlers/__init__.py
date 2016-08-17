@@ -1,3 +1,6 @@
 
 
-from .libcloud import LibcloudHandler                                    # noqa
+try:
+    from .libcloud import LibcloudHandler                                # noqa
+except ImportError:
+    pass

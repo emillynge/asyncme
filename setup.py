@@ -73,8 +73,12 @@ setup(
     platforms=['any'],
     install_requires=[
         'acme',
-        'arroyo-crypto>=1.0'
+        'arroyo-crypto>=1.0',
+        'dnspython'
     ],
+    extras_require={
+        'libcloud': ["apache-libcloud>=1.0.0"],
+    },
     tests_require=[
         'pytest',
         'pytest-flake8',
