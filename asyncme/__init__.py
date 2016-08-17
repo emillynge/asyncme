@@ -1,12 +1,10 @@
-from . import acme                                                       # noqa
-from .acme.client import AcmeClient                                      # noqa
-
-from . import utils                                                      # noqa
+# from . import acme                                                       # noqa
+# from .acme.client import AcmeClient                                      # noqa
 
 
 # Please refrain from specifying a micro version if possible.
 # --------------------------------------------------------------------------- #
-VERSION = (0, 1, 'rc3')
+VERSION = (0, 2, 'rc3')
 # --------------------------------------------------------------------------- #
 
 

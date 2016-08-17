@@ -72,11 +72,8 @@ setup(
     license='MIT',
     platforms=['any'],
     install_requires=[
-        'arroyo>=1.1',
-        'arroyo-crypto>=1.0',
-        'aiohttp>=0.21.6',
-        'jwcrypto>=0.2.1',
-        'dnspython>=1.14.0'
+        'acme',
+        'arroyo-crypto>=1.0'
     ],
     tests_require=[
         'pytest',
@@ -85,6 +82,11 @@ setup(
         'pytest-cov',
         'pytest-timeout'
     ],
+    entry_points={
+        'asyncme.handlers': [
+            'LibcloudHandler = asyncme.contrib.libcloud_handler:Handler',
+        ]
+    },
     keywords=["acme", "let's encrypt", "ssl", "cert", "async", "asyncio"],
     classifiers=[
         'Development Status :: 4 - Beta',
