@@ -23,7 +23,7 @@ if (sys.version_info[0] < 3 or
 # Package Info
 
 NAME = 'asyncme'
-DESCRIPTION = 'ACME Protocol Implementation for AsyncIO'
+DESCRIPTION = 'Async ACME Protocol Client for AsyncIO'
 LONG_DESCRIPTION = None
 try:
     with open('README.rst') as f:
