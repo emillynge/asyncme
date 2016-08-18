@@ -197,11 +197,11 @@ class AsyncmeClient:
         # Determine the JWS 'alg' Type for the Given Key
         # RSA
         if key.algorithm is crypto.KeyAlgorithmType.RSA:
-            if key.size/8 == 256:
+            if key.size / 8 == 256:
                 alg = jose.jwa.RS256
-            elif key.size/8 == 384:
+            elif key.size / 8 == 384:
                 alg = jose.jwa.RS384
-            elif key.size/8 == 512:
+            elif key.size / 8 == 512:
                 alg = jose.jwa.RS512
             else:
                 raise ValueError("RSA key size of {} "

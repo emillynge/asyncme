@@ -221,7 +221,7 @@ class DNS01ChallengeHandler(AcmeChallengeHandler):
                 answers = query.response.answer
             except (NoAnswer, NXDOMAIN):
                 LOG.info("TXT Record {} Not Found: Attempt {}/{}".format(
-                    domain, i+1, attempts
+                    domain, i + 1, attempts
                 ))
                 continue
 
@@ -229,7 +229,7 @@ class DNS01ChallengeHandler(AcmeChallengeHandler):
             for a in answers:
                 if any(self.txt_record_contents() in str(r) for r in a.items):
                     LOG.debug("Valid TXT Record {} Found on Attempt {}".format(
-                        domain, i+1
+                        domain, i + 1
                     ))
 
                     hits += 1
@@ -241,7 +241,7 @@ class DNS01ChallengeHandler(AcmeChallengeHandler):
                 else:
                     LOG.info(
                         "TXT Record {} Found with Wrong Contents: "
-                        "Attempt {}/{}".format(domain, i+1, attempts)
+                        "Attempt {}/{}".format(domain, i + 1, attempts)
                     )
 
         else:
