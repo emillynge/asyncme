@@ -1,12 +1,7 @@
-from . import acme                                                       # noqa
-from .acme.client import AcmeClient                                      # noqa
-
-from . import utils                                                      # noqa
-
 
 # Please refrain from specifying a micro version if possible.
 # --------------------------------------------------------------------------- #
-VERSION = (0, 1, 'rc3')
+VERSION = (0, 3, 'rc1')
 # --------------------------------------------------------------------------- #
 
 
@@ -22,3 +17,6 @@ def _get_version(vt):                                                           
 __version__ = _get_version(VERSION)
 
 del _get_version
+
+
+from .client import AsyncmeClient                                        # noqa
