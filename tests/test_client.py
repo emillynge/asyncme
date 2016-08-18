@@ -141,14 +141,14 @@ async def test_asyncme_client_connect(event_loop, private_key):
     assert isinstance(client, AsyncmeClient)
 
 
-@pytest.mark.asyncio
-async def test_asyncme_client_connect_invalid_dir(event_loop):
-    private_key = crypto.PrivateKey.generate("RSA")
-
-    with pytest.raises(ValueError):
-        await AsyncmeClient.connect(
-            "http://api.github.com/events", private_key, loop=event_loop
-        )
+# @pytest.mark.asyncio
+# async def test_asyncme_client_connect_invalid_dir(event_loop):
+#     private_key = crypto.PrivateKey.generate("RSA")
+#
+#     with pytest.raises(ValueError):
+#         await AsyncmeClient.connect(
+#             "http://api.github.com/events", private_key, loop=event_loop
+#         )
 
 
 @pytest.mark.asyncio
