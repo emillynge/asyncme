@@ -86,11 +86,6 @@ setup(
         'pytest-cov',
         'pytest-timeout'
     ],
-    entry_points={
-        'asyncme.handlers': [
-            'LibcloudHandler = asyncme.contrib.libcloud_handler:Handler',
-        ]
-    },
     keywords=["acme", "let's encrypt", "ssl", "cert", "async", "asyncio"],
     classifiers=[
         'Development Status :: 4 - Beta',
