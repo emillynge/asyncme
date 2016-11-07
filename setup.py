@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-import os
 import sys
 from warnings import warn
 from setuptools import setup, find_packages
 
-here = os.path.abspath(os.path.dirname(__file__))
+import versioneer
 
 
 # --------------------------------------------------------------------------- #
@@ -32,23 +31,9 @@ except (FileNotFoundError, PermissionError):
     pass
 
 
-def _get_version(vt):                                                           # pragma: nocover # noqa
-    vt = tuple(map(str, vt))                                                    # pragma: nocover # noqa
-    m = map(lambda v: v.startswith(('a', 'b', 'rc')), vt)                       # pragma: nocover # noqa
-    try:                                                                        # pragma: nocover # noqa
-        i = next(i for i, v in enumerate(m) if v)                               # pragma: nocover # noqa
-    except StopIteration:                                                       # pragma: nocover # noqa
-        return '.'.join(vt)                                                     # pragma: nocover # noqa
-    return '.'.join(vt[:i]) + '.'.join(vt[i:])                                  # pragma: nocover # noqa
-
-# Read the Version from __init__.py Manually by Opening the File
-init = os.path.join(here, NAME.replace("-", "_"), '__init__.py')
-version_line = list(filter(lambda l: l.startswith('VERSION'), open(init)))[0]
-
-VERSION = _get_version(eval(version_line.split('=')[-1]))
-
 # --------------------------------------------------------------------------- #
 
+VERSION = versioneer.get_version()
 
 upstream_url = "https://github.com/ArroyoNetworks/{}"
 download_url = upstream_url + "/archive/v{}.tar.gz"
