@@ -151,13 +151,18 @@ class AcmeCert(crypto.x509Cert):
           a given location.
     """
 
-    def __init__(self, *args, acme_uri, **kwargs):
+    def __init__(self, *args, acme_uri, issuer_uri=None, **kwargs):
         super().__init__(*args, **kwargs)
         self._location = acme_uri
+        self._issuer = issuer_uri
 
     @property
     def location(self):
         return self._location
+
+    @property
+    def issuer_location(self):
+        return self._issuer
 
 
 class AsyncmeClient:
@@ -406,7 +411,8 @@ class AsyncmeClient:
                 OpenSSL.crypto.FILETYPE_PEM,
                 py_openssl_cert
             ),
-            acme_uri=acme_cert.uri
+            acme_uri=acme_cert.uri,
+            issuer_uri=acme_cert.cert_chain_uri
         )
 
         return cert

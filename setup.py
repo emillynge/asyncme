@@ -72,7 +72,7 @@ setup(
     license='MIT',
     platforms=['any'],
     install_requires=[
-        'acme',
+        'acme>=0.9',
         'arroyo-crypto>=1.0',
         'dnspython'
     ],
