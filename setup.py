@@ -68,7 +68,7 @@ setup(
         'libcloud': ["apache-libcloud>=1.0.0"],
     },
     tests_require=[
-        'pytest>=3.0.2',
+        'pytest',
         'pytest-flake8',
         'pytest-asyncio',
         'pytest-cov',
