@@ -56,6 +56,9 @@ setup(
     include_package_data=True,
     license='MIT',
     platforms=['any'],
+    setup_requires=[
+        'pytest-runner',
+    ],
     install_requires=[
         'acme>=0.9',
         'arroyo-crypto>=1.0',
@@ -65,7 +68,7 @@ setup(
         'libcloud': ["apache-libcloud>=1.0.0"],
     },
     tests_require=[
-        'pytest',
+        'pytest>=3.0.2',
         'pytest-flake8',
         'pytest-asyncio',
         'pytest-cov',

@@ -13,9 +13,6 @@ before_install:
   - pip install codecov
 install:
   - pip install -e .
-before_script:
-  - pip install pytest-runner
-  - pip install pytest-flake8
 script:
   - python setup.py test
 after_success:
