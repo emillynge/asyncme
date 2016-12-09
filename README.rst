@@ -159,13 +159,13 @@ challenge/challenge handler system.
     AWS_SECRET_ID = "SECRET_ID_HERE"
 
     ACME_KEY = crypto.PrivateKey.generate("RSA")
-    CERT_KEY = crypto.PrivateKey.generate("ECDSA")
+    CERT_KEY = crypto.PrivateKey.generate("RSA", size=4096)
 
     CSR = crypto.x509CertSignReq.generate(CERT_KEY, DOMAIN)
 
     async def acme_test():
 
-        client = await Client.connect(DIRECTORY_URL, key, loop=LOOP)
+        client = await Client.connect(DIRECTORY_URL, ACME_KEY, loop=LOOP)
 
         if not client.has_accepted_terms():
             await client.accept_terms()
@@ -193,7 +193,7 @@ challenge/challenge handler system.
             else:
                 raise RuntimeError("Failed to gain authorization for domain")
 
-        cert = await client.request_cert(csr)
+        cert = await client.request_cert(CSR)
 
         return cert
 
