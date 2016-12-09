@@ -204,7 +204,7 @@ class DNS01ChallengeHandler(AcmeChallengeHandler):
         domain = self.txt_record_name()
         hits = 0
 
-        LOG.debug(
+        LOG.info(
             "Waiting for TXT Record {}: {} Attempts".format(domain, attempts)
         )
 
@@ -220,7 +220,7 @@ class DNS01ChallengeHandler(AcmeChallengeHandler):
                 query = resolver.query(domain, 'TXT')
                 answers = query.response.answer
             except (NoAnswer, NXDOMAIN):
-                LOG.info("TXT Record {} Not Found: Attempt {}/{}".format(
+                LOG.debug("TXT Record {} Not Found: Attempt {}/{}".format(
                     domain, i + 1, attempts
                 ))
                 continue
@@ -239,16 +239,22 @@ class DNS01ChallengeHandler(AcmeChallengeHandler):
                         return  # Minimum Number of Hits Found
 
                 else:
-                    LOG.info(
-                        "TXT Record {} Found with Wrong Contents: "
+                    LOG.debug(
+                        "Invalid TXT Record {} Found on "
                         "Attempt {}/{}".format(domain, i + 1, attempts)
                     )
 
         else:
-            LOG.error(
-                "Could not find record for {} (Hits {})".format(domain, hits)
-            )
-            raise ChallengeFailure("Failed to Find TXT Record")
+            if not hits:
+                msg = "Failed to Find Valid Record for {}".format(domain)
+                LOG.error(msg)
+                raise ChallengeFailure(msg)
+            else:
+                msg = "Record {} Only Found {} Times But Required {}".format(
+                    domain, hits, min_hits
+                )
+                LOG.error(msg)
+                raise ChallengeFailure(msg)
 
     async def _do_verify(self) -> None:
         """
