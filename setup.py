@@ -54,7 +54,7 @@ setup(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]
     ),
     include_package_data=True,
-    license='MIT',
+    license='Apache',
     platforms=['any'],
     setup_requires=[
         'pytest-runner',
