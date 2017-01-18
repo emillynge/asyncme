@@ -131,15 +131,31 @@ class ExtendedNetwork(ClientNetwork):
     Used to add additional functionality to the upstream ACME client.
     """
     def post(self, url, obj, content_type=ClientNetwork.JSON_CONTENT_TYPE,
-             checked=True, **kwargs):
+             checked=True, retries=5, **kwargs):
 
-        data = self._wrap_in_jws(obj, self._get_nonce(url))
-        response = self._send_request('POST', url, data=data, **kwargs)
-        self._add_nonce(response)
-        if checked:
-            return self._check_response(response, content_type=content_type)
+        last_error = None
+
+        for i in range(retries):
+            data = self._wrap_in_jws(obj, self._get_nonce(url))
+            response = self._send_request('POST', url, data=data, **kwargs)
+            self._add_nonce(response)
+            if checked:
+                try:
+                    return self._check_response(response,
+                                                content_type=content_type)
+                except messages.Error as e:
+                    # The server thinks we sent a bad nonce, try request again.
+                    last_error = e
+                    if e.typ == 'urn:acme:error:badNonce':
+                        continue
+                    else:
+                        raise
+            else:
+                return response
         else:
-            return response
+            LOG.debug("Failed Sending Request, Tried {} Times".format(retries))
+            if isinstance(last_error, Exception):
+                raise last_error
 
 
 class AcmeCert(crypto.x509Cert):
